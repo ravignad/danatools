@@ -1,0 +1,9 @@
+__pycache__/
+.idea/
+venv/
+
+
+# Distribution / packaging
+# sda-tools.egg-info/
+requirements.txt
+dist/
