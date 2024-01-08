@@ -11,7 +11,6 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
-# from scipy.stats import chi2, binned_statistic
 
 
 def get_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: int = 1000) -> np.ndarray:
