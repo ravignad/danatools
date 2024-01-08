@@ -1,11 +1,11 @@
-# sda-tools
+# sda_tools
 
 A bunch of convenient tools to analyze data. It provides some handy functions on top of NumPy, SciPy and Matplotlib to perform some frequent tasks. 
 
 ## Install
 
 ```sh
-python -m pip install sda-tools
+python -m pip install sda_tools
 ```
 
 ## Features
@@ -21,7 +21,7 @@ python -m pip install sda-tools
 ## How to use
 
 ```py
-import sda-tools
+import sda_tools
 ```
 
 ## Contributing
@@ -29,7 +29,7 @@ If you'd like to contribute, please fork the repository and use a feature
 branch. Pull requests are warmly welcome.
 
 ## Links
-- Repository: https://github.com/ravignad/sda-tools/
+- Repository: https://github.com/ravignad/sda_tools/
 
 ## Licensing
 The code in this project is licensed under MIT license.
