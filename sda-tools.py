@@ -10,9 +10,8 @@ from typing import Tuple
 # Third-Party Imports
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.linalg import inv
-from scipy.stats import chi2
-from scipy.stats import binned_statistic
+import scipy
+# from scipy.stats import chi2, binned_statistic
 
 
 def get_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: int = 1000) -> np.ndarray:
@@ -51,16 +50,9 @@ def linear_least_squares(model_matrix: np.ndarray, y: np.ndarray, ysigma: np.nda
 
     # Parameter estimators
     cova_y = np.diag(ysigma * ysigma)
-    cova_par = inv(model_matrix.T @ inv(cova_y) @ model_matrix)
-    matrix_b = cova_par @ model_matrix.T @ inv(cova_y)
+    cova_par = np.linalg.inv(model_matrix.T @ np.linalg.inv(cova_y) @ model_matrix)
+    matrix_b = cova_par @ model_matrix.T @ np.linalg.inv(cova_y)
     theta_est = matrix_b @ y
-
-    # Future implementation with Einstein summation (to be used for large datasets)
-    # inv_var_y = ysigma**(-2)
-    # inv_cova_par2 = np.einsum('ji,j,jl', model_matrix, inv_var_y, model_matrix)
-    # cova_par2 = inv(inv_cova_par2)
-    # matrix_b2 = np.einsum('ij,kj,k -> ik', cova_par2, model_matrix, inv_var_y)
-    # theta_est2 = np.einsum('ij,j', matrix_b2, y)
 
     # Parameter errors
     errors = np.sqrt(np.diagonal(cova_par))
@@ -68,9 +60,9 @@ def linear_least_squares(model_matrix: np.ndarray, y: np.ndarray, ysigma: np.nda
 
     # Goodness of fit
     residuals = y - model_matrix @ theta_est
-    chi2_min = residuals.T @ inv(cova_y) @ residuals
+    chi2_min = residuals.T @ np.linalg.inv(cova_y) @ residuals
     ndof = len(y) - len(theta_est)
-    pvalue = chi2.sf(chi2_min, ndof)
+    pvalue = scipy.stats.chi2.sf(chi2_min, ndof)
 
     return {
         'est': theta_est,
@@ -155,7 +147,7 @@ def get_coverage(estimators: np.ndarray, errors: np.ndarray, parameter: float) -
 
 def get_pvalue(chi2_sim: list, chi2_obs: float) -> Tuple[float, float]:
     """
-    Calculate the p-value of a chi-squared test.
+    Estimate the p-value of a chi-squared test.
 
     Args:
         chi2_sim (list): List of simulated chi-squared values.
@@ -187,7 +179,8 @@ def savefigs(basename: str, formats: tuple = ('.eps', '.pdf', '.png', '.svg'), f
         fig.savefig(figure_name)
 
 
-def profile_histogram(x: np.ndarray, y: np.ndarray, bins: int, histo_range: tuple = None) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def profile_histogram(x: np.ndarray, y: np.ndarray, bins: int, histo_range: tuple = None) \
+        -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Compute a profile histogram.
 
@@ -201,9 +194,9 @@ def profile_histogram(x: np.ndarray, y: np.ndarray, bins: int, histo_range: tupl
         tuple: Counts, means, standard deviations, and bin edges.
     """
 
-    counts, bin_edges, __ = binned_statistic(x, y, statistic='count', bins=bins, range=histo_range)
-    means, __, __ = binned_statistic(x, y, statistic='mean', bins=bins, range=histo_range)
-    means2, __, __ = binned_statistic(x, y*y, statistic='mean', bins=bins, range=histo_range)
+    counts, bin_edges, __ = scipy.stats.binned_statistic(x, y, statistic='count', bins=bins, range=histo_range)
+    means, __, __ = scipy.stats.binned_statistic(x, y, statistic='mean', bins=bins, range=histo_range)
+    means2, __, __ = scipy.stats.binned_statistic(x, y*y, statistic='mean', bins=bins, range=histo_range)
 
     # Standard deviations with Bessel correction
     variances = counts * (means2 - means**2) / (counts-1)
