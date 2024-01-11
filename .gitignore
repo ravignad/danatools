@@ -4,6 +4,7 @@ venv/
 
 
 # Distribution / packaging
-sda_tools.egg-info/
+danatools.egg-info/
 requirements.txt
 dist/
+build/
