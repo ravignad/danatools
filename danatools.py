@@ -215,3 +215,26 @@ def array_rms(array):
          square root of the mean of the array elements
     """
     return math.sqrt(np.mean(array ** 2))
+
+
+def chi_square_test(observed: np.ndarray, mean_exp: np.ndarray, std_dev_exp: np.ndarray,
+                    ddof: float = 0) -> Tuple[float, float]:
+    """
+    Perform a chi-square test
+
+    Args:
+        observed (np.array): observed value of the random variable
+        mean_exp (np.array): expected mean of the random variable according to the null hypothesis
+        std_dev_exp (np.ndarray): expected standard deviation of the random variable according 
+            to the null hypothesis
+        ddof (float): delta degrees of freedom
+
+    Returns:
+        tuple: observed value of the test statistic, pvalue of the test statistic
+         
+    """
+    z_scores = (observed - mean_exp) / std_dev_exp
+    test_statistic = np.sum(z_scores**2)
+    degrees_of_freedom = len(observed) - ddof
+    pvalue = scipy.stats.chi2.sf(test_statistic, degrees_of_freedom)
+    return test_statistic, pvalue
