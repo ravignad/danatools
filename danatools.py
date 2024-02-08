@@ -178,6 +178,25 @@ def savefigs(basename: str, formats: tuple = ('.eps', '.pdf', '.png', '.svg'), f
         fig.savefig(figure_name)
 
 
+def histogram(a, *args, **kwargs):
+    """
+    Build a numpy histogram but return the bin centers instead of the edges.
+
+    Args:
+        a (array_like): Input data.
+        *args: numpy.histogram optional arguments.
+        **kwargs: numpy.histogram keyword arguments.
+
+    Returns:
+        hist (array): The values of the histogram.
+        bin_centres (array): Bin centers.
+    """
+
+    counts, bin_edges = np.histogram(a, *args, **kwargs)
+    bin_centres = (bin_edges[:-1] + bin_edges[1:]) / 2
+    return counts, bin_centres
+
+
 def profile_histogram(x: np.ndarray, y: np.ndarray, bins: int, histo_range: tuple = None) \
         -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
@@ -238,3 +257,12 @@ def chi_square_test(observed: np.ndarray, mean_exp: np.ndarray, std_dev_exp: np.
     degrees_of_freedom = len(observed) - ddof
     pvalue = scipy.stats.chi2.sf(test_statistic, degrees_of_freedom)
     return test_statistic, pvalue
+
+
+def covariance_matrix_2d(sigma_x: float, sigma_y: float, correlation: float) -> np.array:
+    covariance_matrix = np.empty(shape=(2, 2))
+    covariance_matrix[0, 0] = sigma_x ** 2
+    covariance_matrix[0, 1] = correlation * sigma_x * sigma_y
+    covariance_matrix[1, 0] = covariance_matrix[0, 1]
+    covariance_matrix[1, 1] = sigma_y ** 2
+    return covariance_matrix
