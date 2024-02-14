@@ -178,23 +178,32 @@ def savefigs(basename: str, formats: tuple = ('.eps', '.pdf', '.png', '.svg'), f
         fig.savefig(figure_name)
 
 
-def histogram(a, *args, **kwargs):
+def histogram(a, bins=10, range=None, density=None, weights=None):
     """
     Build a numpy histogram but return the bin centers instead of the edges.
 
     Args:
-        a (array_like): Input data.
-        *args: numpy.histogram optional arguments.
-        **kwargs: numpy.histogram keyword arguments.
+        Same as numpy.histogram
+        density: same as numpy.histogram with the exception that if density is True, returns a histogram
+        representing the probability density function. In contrast numpy.histogram returns a histogram normalized
+        to 1 over the range specified in the input.
 
     Returns:
         hist (array): The values of the histogram.
         bin_centres (array): Bin centers.
     """
 
-    counts, bin_edges = np.histogram(a, *args, **kwargs)
+    hist_values, bin_edges = np.histogram(a, bins, range, density, weights)
     bin_centres = (bin_edges[:-1] + bin_edges[1:]) / 2
-    return counts, bin_centres
+
+    # Making the density a probability mass function by renormalizing by total number of elements
+    if density is True and range is not None:
+        total_elements = len(a)
+        elements_in_range = np.count_nonzero( (range[0] < a) & (a < range[1]) )
+        hist_values *= elements_in_range / total_elements
+        
+    
+    return hist_values, bin_centres
 
 
 def profile_histogram(x: np.ndarray, y: np.ndarray, bins: int, histo_range: tuple = None) \
