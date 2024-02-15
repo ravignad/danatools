@@ -275,3 +275,26 @@ def covariance_matrix_2d(sigma_x: float, sigma_y: float, correlation: float) -> 
     covariance_matrix[1, 0] = covariance_matrix[0, 1]
     covariance_matrix[1, 1] = sigma_y ** 2
     return covariance_matrix
+
+def normal_cost_2d(mu_mesh: np.ndarray, x_meas: np.ndarray, cov: np.ndarray) -> np.ndarray:
+    """
+    Calculate the normal cost of a bivariate normal variable
+
+    Parameters
+    ----------
+    mu_mesh :  np.ndarray
+        Values of the 2d mu parameter. The shape of the array is (nx, ny, 2) with nx and ny the number of
+        points along the x and y axis respectively
+    x_meas : np.ndarray
+        Measured value of the bivariate normal variable.
+    cov : np.ndarray
+        Covariance matrix.
+
+    Returns
+    -------
+    An array with dimensions (nx, ny) containing the values of the cost function in each point
+    """
+    hessian_matrix = np.linalg.inv(cov)
+    cost_mesh = np.einsum("kli,ij,klj->kl", x_meas-mu_mesh, hessian_matrix, x_meas-mu_mesh)
+    return cost_mesh
+
