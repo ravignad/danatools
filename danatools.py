@@ -123,23 +123,21 @@ def get_bias(estimators: np.ndarray, parameter: float) -> Tuple[float, float]:
     return bias, sigma_mean
 
 
-def get_coverage(estimators: np.ndarray, errors: np.ndarray, parameter: float) -> Tuple[float, float]:
+def get_coverage(lower_limits: np.ndarray, upper_limits: np.ndarray, parameter: float) -> Tuple[float, float]:
     """
     Estimate the coverage of the confidence intervals.
 
     Args:
-        estimators (np.ndarray): Array of parameter estimators.
-        errors (np.ndarray): Array of parameter errors.
+        lower_limits (np.ndarray): Lower limit of the confidence intervals.
+        upper_limits (np.ndarray): Upper limit of the confidence intervals.
         parameter (float): True parameter value.
 
     Returns:
         tuple: Coverage and its standard error.
     """
-    theta_min = np.array(estimators) - np.array(errors)
-    theta_max = np.array(estimators) + np.array(errors)
-    hits = ((parameter - theta_min) * (parameter - theta_max) < 0).sum()
-    ndata = len(estimators)
-    coverage = hits / ndata
+    nhits = np.logical_and(lower_limits < parameter, parameter < upper_limits).sum()
+    ndata = len(lower_limits)
+    coverage = nhits / ndata
     coverage_error = math.sqrt(coverage * (1 - coverage) / ndata)
     return coverage, coverage_error
 
