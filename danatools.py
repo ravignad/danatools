@@ -33,78 +33,6 @@ def get_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: 
     return ellipse.T
 
 
-def linear_least_squares(model_matrix: np.ndarray, y: np.ndarray, ysigma: np.ndarray) -> dict:
-    """
-    Fit data with a linear least squares method.
-
-    Args:
-        model_matrix (np.ndarray): Model/design/X matrix.
-        y (np.ndarray): Independent variable.
-        ysigma (np.ndarray): Y errors.
-
-    Returns:
-        dict: Dictionary containing parameter estimators, errors, covariance matrix, correlation matrix,
-        chi-squared minimum, degrees of freedom, and p-value.
-    """
-
-    # Parameter estimators
-    cova_y = np.diag(ysigma * ysigma)
-    cova_par = np.linalg.inv(model_matrix.T @ np.linalg.inv(cova_y) @ model_matrix)
-    matrix_b = cova_par @ model_matrix.T @ np.linalg.inv(cova_y)
-    theta_est = matrix_b @ y
-
-    # Parameter errors
-    errors = np.sqrt(np.diagonal(cova_par))
-    corr = cova_par / np.tensordot(errors, errors, axes=0)
-
-    # Goodness of fit
-    residuals = y - model_matrix @ theta_est
-    chi2_min = residuals.T @ np.linalg.inv(cova_y) @ residuals
-    ndof = len(y) - len(theta_est)
-    pvalue = scipy.stats.chi2.sf(chi2_min, ndof)
-
-    return {
-        'est': theta_est,
-        'errors': errors,
-        'cova': cova_par,
-        'corr': corr,
-        'chi2_min': chi2_min,
-        'ndof': ndof,
-        'pvalue': pvalue
-    }
-
-
-def cost_poisson(y: np.ndarray, mu: np.ndarray) -> float:
-    """
-    Cost function of a Poisson variable.
-
-    Args:
-        y (np.ndarray): Measured values of the dependent variable.
-        mu (np.ndarray): Model values at each measured data point.
-
-    Returns:
-        float: Fit cost.
-    """
-    cost_array = 2 * (mu - y) - 2 * y * np.log(mu / y)
-    return cost_array.sum()
-
-
-def fit_errors(grad: np.ndarray, cova: np.ndarray) -> np.ndarray:
-    """
-    Calculate the fit errors by propagating the parameter errors.
-
-    Args:
-        grad (np.ndarray): Gradient of the fit model with respect to the parameters.
-        cova (np.ndarray): Covariance matrix of the fit parameters.
-
-    Returns:
-        np.ndarray: Fit errors.
-    """
-    var_mu_est = np.einsum("ki,ij,kj->k", grad, cova, grad)
-    sigma_mu_est = np.sqrt(var_mu_est)
-    return sigma_mu_est
-
-
 def get_bias(estimators: np.ndarray, parameter: float) -> Tuple[float, float]:
     """
     Estimate the bias of a parameter estimator.
@@ -274,9 +202,10 @@ def covariance_matrix_2d(sigma_x: float, sigma_y: float, correlation: float) -> 
     covariance_matrix[1, 1] = sigma_y ** 2
     return covariance_matrix
 
+
 def normal_cost_2d(mu_mesh: np.ndarray, x_meas: np.ndarray, cov: np.ndarray) -> np.ndarray:
     """
-    Calculate the normal cost of a bivariate normal variable
+    Calculate the normal cost of a bivariate normal variable for many points in the parameter space
 
     Parameters
     ----------
