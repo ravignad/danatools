@@ -201,6 +201,32 @@ def profile_histogram(x: np.ndarray, y: np.ndarray, bins: int, histo_range: tupl
     return counts, means, standard_deviations, bin_edges
 
 
+def median_profile(x, y, bins) \
+        -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Compute the medians of dependent variable in bins of the independent variable.
+
+    Parameters
+    ----------
+        x: numpy.ndarray
+            The x-values of the independent variable
+        y : numpy.ndarray
+            The y-values of the dependent variable
+        bins : int or sequence of scalars
+            See bins in scipy.stats.binned_statistic
+
+    Returns
+    -------
+        tuple
+            Bin centers, medians
+    """
+
+    medians, bin_edges, __ = scipy.stats.binned_statistic(x, y, statistic='median', bins=bins)
+    bin_centres = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+    return medians, bin_centres
+
+
 def array_rms(array):
     """
     Calculate the root of the mean of the squares of an array
