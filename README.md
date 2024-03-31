@@ -1,6 +1,6 @@
 # danatools
 
-A bunch of convenient tools to analyze data. It provides some handy functions on top of NumPy, SciPy and Matplotlib to perform some frequent tasks. 
+A bunch of convenient tools to analyze data. It provides handy functions on top of NumPy, SciPy and Matplotlib to perform some frequent tasks. 
 
 ## Install
 
