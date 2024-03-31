@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "danatools"
-version = "0.2.0"
+version = "0.1.1"
 description = "A bunch of convenient tools to analyze data"
 readme = "README.md"
 authors = [{ name = "Diego Ravignani", email = "diego.ravignani@gmail.com" }]
@@ -21,7 +21,7 @@ dependencies = [
     "scipy >= 1.9.3",
     "matplotlib >= 3.7.4"
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 
 [project.urls]
 Homepage = "https://github.com/ravignad/danatools"
