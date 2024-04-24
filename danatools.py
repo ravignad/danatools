@@ -218,13 +218,23 @@ def median_profile(x, y, bins) \
     Returns
     -------
         tuple
-            Bin centers, medians
+            Bin centers, medians, quartiles 1, quartiles 3
     """
 
     medians, bin_edges, __ = scipy.stats.binned_statistic(x, y, statistic='median', bins=bins)
     bin_centres = (bin_edges[:-1] + bin_edges[1:]) / 2
 
-    return medians, bin_centres
+    def percentile25(x):
+        return np.percentile(x, 25)
+    
+    quartiles1, __, __ = scipy.stats.binned_statistic(x, y, statistic=percentile25, bins=bins)
+    
+    def percentile75(x):
+        return np.percentile(x, 75)
+    
+    quartiles3, __, __ = scipy.stats.binned_statistic(x, y, statistic=percentile75, bins=bins)
+
+    return bin_centres, medians, quartiles1, quartiles3 
 
 
 def array_rms(array):
