@@ -334,3 +334,22 @@ def normal_cost_2d(mu_mesh: np.ndarray, x_meas: np.ndarray, cov: np.ndarray) -> 
     hessian_matrix = np.linalg.inv(cov)
     cost_mesh = np.einsum("kli,ij,klj->kl", x_meas-mu_mesh, hessian_matrix, x_meas-mu_mesh)
     return cost_mesh
+
+
+def get_correlation_matrix(covariance_matrix):
+    """
+    Get the correlation matrix of the fit parameters.
+   Parameters
+    ----------
+    covariance_matrix : np.ndarray
+        Covariance matrix of the fit parameters.
+
+    Returns
+    -------
+    np.ndarray
+        Correlation matrix of the fit parameters.
+    """
+
+    errors = np.sqrt(np.diagonal(covariance_matrix))
+    correlation_matrix = covariance_matrix / np.tensordot(errors, errors, axes=0)
+    return correlation_matrix
