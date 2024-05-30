@@ -11,6 +11,7 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+import pandas as pd
 
 
 def get_ellipse(center: np.ndarray, cova: np.ndarray, nsigma: int = 1, npoints: int = 1000) -> np.ndarray:
@@ -115,7 +116,7 @@ def get_pvalue(chi2_sim: list, chi2_obs: float) -> Tuple[float, float]:
     return pvalue, pvalue_error
 
 
-def savefigs(basename: str, formats: tuple = ('.eps', '.pdf', '.png', '.svg'), folder: str = '') -> None:
+def savefigs(basename: str, folder: str = "", formats: tuple = ('.eps', '.pdf', '.png', '.svg')) -> None:
     """
     Save a figure to multiple formats and print their names
 
@@ -353,3 +354,30 @@ def get_correlation_matrix(covariance_matrix):
     errors = np.sqrt(np.diagonal(covariance_matrix))
     correlation_matrix = covariance_matrix / np.tensordot(errors, errors, axes=0)
     return correlation_matrix
+
+
+def print_parameters(estimators, errors):
+    number_of_parameters = len(estimators)
+    parameter_df = pd.DataFrame({"Estimator": estimators, "Error": errors},
+                                index=range(number_of_parameters))
+    parameter_df.index.name = "Parameter"
+    print(parameter_df)
+    
+    
+def print_chi_square(chi_square, ndof):
+    print("\nGoodness of fit")
+    pvalue = scipy.stats.chi2.sf(chi_square, ndof)
+    print(f"Chi square = {chi_square:.4g}")
+    print(f"Degrees of freedom = {ndof}")
+    print(f"Pvalue = {pvalue:.4g}")
+
+
+# sin²θ to θ in degrees
+def sin2_to_deg(x):   
+    sin_zenith = np.sqrt(x)
+    return np.rad2deg(np.arcsin(sin_zenith))
+
+
+# θ in degrees to sin²θ
+def deg_to_sin2(sin_zenith):   
+    return np.sin(np.deg2rad(sin_zenith))**2
